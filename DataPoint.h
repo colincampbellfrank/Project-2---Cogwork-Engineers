@@ -1,0 +1,13 @@
+//
+// Created by colin on 11/2/2026.
+//
+
+#ifndef PROJECT_2_COGWORK_ENGINEERS_DATAPOINT_H
+#define PROJECT_2_COGWORK_ENGINEERS_DATAPOINT_H
+
+
+class DataPoint {
+};
+
+
+#endif //PROJECT_2_COGWORK_ENGINEERS_DATAPOINT_H
