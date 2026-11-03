@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "DataPoint.h"
+#include "DataHeap.h"
 
 
 using namespace std;
