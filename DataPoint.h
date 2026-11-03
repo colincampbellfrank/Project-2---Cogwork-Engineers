@@ -17,28 +17,28 @@ private:
     int tot_cases;
     int new_deaths;
     int tot_deaths;
-    DataPoint(string _date, string _country, string _region, string _new_cases, string _tot_cases, string _new_deaths, string _tot_deaths) : date(_date), country(_country), region(_region), new_cases(_new_cases), tot_cases(_tot_cases), new_deaths(_new_deaths), tot_deaths(_tot_deaths) {}
 public:
+    DataPoint(string _date, string _country, string _region, string _new_cases, string _tot_cases, string _new_deaths, string _tot_deaths) : date(_date), country(_country), region(_region), new_cases(stoi(_new_cases)), tot_cases(stoi(_tot_cases)), new_deaths(stoi(_new_deaths)), tot_deaths(stoi(_tot_deaths)) {}
     //Get functions for the private attributes
-    void getDate() {
+    string getDate() {
         return date;
     }
-    void getCountry() {
+    string getCountry() {
         return country;
     }
-    void getRegion() {
+    string getRegion() {
         return region;
     }
-    void getNewCases() {
+    int getNewCases() {
         return new_cases;
     }
-    void getTotCases() {
+    int getTotCases() {
         return tot_cases;
     }
-    void getNewDeaths() {
+    int getNewDeaths() {
         return new_deaths;
     }
-    void getTotDeaths() {
+    int getTotDeaths() {
         return tot_deaths;
     }
 };
