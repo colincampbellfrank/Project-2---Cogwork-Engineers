@@ -34,10 +34,19 @@ int main() {
         string field;
         vector<string> row;
 
-        while (getline(ss, field, ',')) {
+        while (ss.good()) {
+            if (ss.peek() == '"') { //cells that contain a comma themselves will start with a quote, exception condition
+                ss.get(); //get rid of start quote
+                getline(ss, field, '"'); //read until end quote
+                if (ss.peek() == ',') ss.get(); //get rid of comma following the quote
+            } else {
+                //all normal cells
+                getline(ss, field, ',');
+            }
+
+            if (field.empty()) field = "0"; //correct for empty cells
             row.push_back(field);
         }
-
         DataPoint data_point=DataPoint(row[0], row[2], row[3], row[4], row[5], row[6], row[7]);
         data.push_back(data_point);
     }
