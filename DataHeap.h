@@ -20,10 +20,10 @@ class DataHeap {
 private:
     vector<DataPoint> array;
     int size;
-    int capacity;
     const string attribute; //identify what kind of max heap we are making based on the input
+    //capacity not needed
 public:
-    DataHeap(int _capacity, const string &_attribute) : capacity(_capacity), attribute(_attribute) {
+    DataHeap(const string &_attribute) : attribute(_attribute) {
         size=0;
     }
     int ind_interpretAtt(int i) { //interpret one i based on attribute
@@ -106,8 +106,38 @@ public:
             heapify(largest);
         }
     }
-    //buildHeap function unnecessary
+    //buildHeap function unnecessary since we won't give an array to build from
+    void insert (DataPoint point) {
+        size++;
+        int i=size-1;
+        array[i]=point;
+        int point_value=ind_interpretAtt(i); //use helper to get the relevant value based on attribute
+        int parent_value=ind_interpretAtt((i-1)/2);
 
+        while (i!=0 && parent_value<point_value) {
+            swap(array[i], array[(i-1)/2]);
+            i=(i-1)/2;
+        }
+    }
+    DataPoint top() { //return attribute value of the top element
+        if (size <= 0) cout<<"top error, empty heap"<<endl;
+        return array[0];
+    }
+    DataPoint pop() {
+        if (size <= 0) cout<<"pop error, empty heap"<<endl;
+        if (size == 1) {
+            size--;
+            return array[0];
+        }
+        //store the maximum value, and remove it
+        DataPoint root = array[0];
+        array[0]=array[size - 1];
+        size--;
+        //heapify the root node after deletion
+        heapify(0);
+        return root;
+    }
+    //won't add DeleteKey now as I don't think it will be used in the functions required
 };
 
 
