@@ -31,22 +31,36 @@ class BPlusTree
     std::string focus_attribute;
     int max_keys;
 
+    // helper functions (insert)
     void split(TreeNode* parent, TreeNode* child, int index);
+    void insert_non_full(TreeNode* node, DataPoint data_point);
 
 public:
 
     // Creates an empty B+ Tree sorted by the specified attribute
-    BPlusTree(std::string attribute) : focus_attribute(attribute), max_keys(240) {}
+    //  Attribute options: (tot = total)
+        // "date", "new_cases", "tot_cases", "new_deaths", "tot_deaths"
+    // Will default to "date" if an invalid attribute is specified
+    BPlusTree(std::string attribute) : focus_attribute(attribute), max_keys(240) {
+        if (attribute != "new_cases" && attribute != "tot_cases" && attribute != "new_deaths" && attribute != "tot_deaths") {
+            focus_attribute = "date";
+        }
+    }
+
 
     // Allows for customization of the maximum number of keys per node in the B+ Tree in case of smaller trees
-    BPlusTree(std::string attribute, int _max_keys) : focus_attribute(attribute), max_keys(max_keys) {}
+    BPlusTree(std::string attribute, int _max_keys) : focus_attribute(attribute), max_keys(max_keys) {
+        if (attribute != "new_cases" && attribute != "tot_cases" && attribute != "new_deaths" && attribute != "tot_deaths") {
+            focus_attribute = "date";
+        }
+    }
+
 
     // Inserts a DataPoint into the B+ Tree
-    // Returns 1 if the insertion was successful, 0 if the insertion failed
             // Notes:
             // If the specified attribute is tied (ex: total_deaths = total_deaths), the insertion will resort
             // to using the date to break the tie and then country alphabetically if the date is also tied
-    int insert(DataPoint dataPoint);
+    void insert(DataPoint dataPoint);
 
 };
 
