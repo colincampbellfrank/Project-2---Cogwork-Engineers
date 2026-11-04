@@ -5,8 +5,8 @@
 
 
 
-// ----------- Tree Functions Here ------------
-
+// ----------- Tree Function Definitions Here ------------
+// Check bPlus.h for function descriptions and use instructions
 
 int BPlusTree::insert(DataPoint data_point)
 {
