@@ -13,21 +13,25 @@ class BPlusTree
 {
     struct TreeNode
     {
-        bool isLeaf = true;
+        bool is_leaf;
         TreeNode* next;
-        int keys = 0;
+        int key_count = 0;
 
-        std::vector<DataPoint> data;
+        std::vector<DataPoint> keys;
         std::vector<TreeNode*> children;
 
-        TreeNode(DataPoint _data) : data({ _data}), children({}) {};
+        // empty node constructor
+        TreeNode(bool _is_leaf) :is_leaf(_is_leaf), keys({}), children({}) {};
+
+        // node constructor with data point
+        TreeNode(DataPoint _data, bool _is_leaf) : keys({ _data}), is_leaf(_is_leaf), children({}) {};
     };
 
     TreeNode* root = nullptr;
     std::string focus_attribute;
     int max_keys;
 
-    int split(TreeNode* parent, TreeNode* child, int index);
+    void split(TreeNode* parent, TreeNode* child, int index);
 
 public:
 
