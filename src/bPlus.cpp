@@ -33,6 +33,19 @@ void BPlusTree::insert(DataPoint data_point)
 }
 
 
+int BPlusTree::getFocusAttribute(DataPoint& dp) {
+    if (focus_attribute == "new_cases") {
+        return dp.getNewCases();
+    } else if (focus_attribute == "tot_cases") {
+        return dp.getTotCases();
+    } else if (focus_attribute == "new_deaths") {
+        return dp.getNewDeaths();
+    } else if (focus_attribute == "tot_deaths") {
+        return dp.getTotDeaths();
+    }
+}
+
+
 // Internal function for inserting a data point into a specified node
 void BPlusTree::insert_non_full(TreeNode * node, DataPoint data_point)
 {
@@ -40,27 +53,27 @@ void BPlusTree::insert_non_full(TreeNode * node, DataPoint data_point)
     std::string country = data_point.getCountry();
 
     // create a function to get all focus attribute values so checking between them is not required late (except for date)
-    std::function<int(DataPoint&)> get_focus_value;
-    if (focus_attribute == "new_cases") {
-        get_focus_value = [](DataPoint& dp) { return dp.getNewCases(); };
-    } else if (focus_attribute == "tot_cases") {
-        get_focus_value = [](DataPoint& dp) { return dp.getTotCases(); };
-    } else if (focus_attribute == "new_deaths") {
-        get_focus_value = [](DataPoint& dp) { return dp.getNewDeaths(); };
-    } else if (focus_attribute == "tot_deaths") {
-        get_focus_value = [](DataPoint& dp) { return dp.getTotDeaths(); };
-    }
+    // std::function<int(DataPoint&)> get_focus_value;
+    // if (focus_attribute == "new_cases") {
+    //     get_focus_value = [](DataPoint& dp) { return dp.getNewCases(); };
+    // } else if (focus_attribute == "tot_cases") {
+    //     get_focus_value = [](DataPoint& dp) { return dp.getTotCases(); };
+    // } else if (focus_attribute == "new_deaths") {
+    //     get_focus_value = [](DataPoint& dp) { return dp.getNewDeaths(); };
+    // } else if (focus_attribute == "tot_deaths") {
+    //     get_focus_value = [](DataPoint& dp) { return dp.getTotDeaths(); };
+    // }
 
     if (node->is_leaf){
 
         node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), data_point, 
             //as DataPoint is a custom class, a lambda function is used for comparison of the focus attribute
-            [this, get_focus_value](DataPoint& a, DataPoint& b) {
+            [this](DataPoint& a, DataPoint& b) {
 
                 // checks every possible focus attribute for if they are tied, and if not, returns the comparison
                 if (focus_attribute != "date") {
-                    if (get_focus_value(a) != get_focus_value(b)) {
-                        return get_focus_value(a) < get_focus_value(b);
+                    if (getFocusAttribute(a) != getFocusAttribute(b)) {
+                        return getFocusAttribute(a) < getFocusAttribute(b);
                     }
                 
                 // in the case of a tie, or the focus attribute is 'date', compare by date, and then country if the date is also tied
@@ -80,7 +93,7 @@ void BPlusTree::insert_non_full(TreeNode * node, DataPoint data_point)
     else {
         // Find the index(i) of the child node to insert into, based on the focus attribute and date/country for tie-breaking
         int i = node->keys.size() - 1;
-        while (i >= 0 && get_focus_value(data_point) < get_focus_value(node->keys[i]) && data_point.getDate() < node->keys[i].getDate() && data_point.getCountry() < node->keys[i].getCountry()) {
+        while (i >= 0 && getFocusAttribute(data_point) < getFocusAttribute(node->keys[i]) && data_point.getDate() < node->keys[i].getDate() && data_point.getCountry() < node->keys[i].getCountry()) {
             i--;
         }
         i++;
@@ -89,9 +102,9 @@ void BPlusTree::insert_non_full(TreeNode * node, DataPoint data_point)
             split(node, node->children[i], i);
             // if the new data point is greater than the median, we need to insert into the new child node
             // the three different cases are for the different level of tie-breaking (focus attribute, date, country)
-            if (get_focus_value(data_point) > get_focus_value(node->keys[i]) || 
-                (get_focus_value(data_point) == get_focus_value(node->keys[i]) && data_point.getDate() > node->keys[i].getDate()) || 
-                (get_focus_value(data_point) == get_focus_value(node->keys[i]) && data_point.getDate() == node->keys[i].getDate() && data_point.getCountry() > node->keys[i].getCountry())) {
+            if (getFocusAttribute(data_point) > getFocusAttribute(node->keys[i]) || 
+                (getFocusAttribute(data_point) == getFocusAttribute(node->keys[i]) && data_point.getDate() > node->keys[i].getDate()) || 
+                (getFocusAttribute(data_point) == getFocusAttribute(node->keys[i]) && data_point.getDate() == node->keys[i].getDate() && data_point.getCountry() > node->keys[i].getCountry())) {
                 i++;
             }
         }
@@ -103,7 +116,7 @@ void BPlusTree::insert_non_full(TreeNode * node, DataPoint data_point)
 
 
 // Internal function for splitting nodes when exceeding maximum keys.
-void BPlusTree::split(TreeNode * parent, TreeNode * child, int index)
+void BPlusTree::split(TreeNode* parent, TreeNode* child, int index)
 {
     // Gets a readable variable for the median index and value
     int median_index = child->key_count / 2;
@@ -144,4 +157,152 @@ void BPlusTree::split(TreeNode * parent, TreeNode * child, int index)
     parent->key_count = parent->keys.size();
     new_node->key_count = new_node->keys.size();
     child->key_count = child->keys.size();
+}
+
+
+
+
+
+
+// Normal search function
+std::vector<DataPoint> BPlusTree::searchByAttribute(int attribute_value)
+{
+    std::vector<DataPoint> results;
+    TreeNode* current = root;
+    
+    // Traverse down the tree to find the appropriate leaf node
+    while (!current->is_leaf) {
+        int i = 0;
+        while (i < current->keys.size() && attribute_value > getFocusAttribute(current->keys[i])) {
+            i++;
+        }
+        current = current->children[i];
+    }
+
+    // As long as the end of the leaf nodes has not been reached
+    while (current != nullptr) {
+        // for the keys in the current leaf node
+        for (int i = 0; i < current->keys.size(); i++) {
+            // If the key matches the search value, add it to the results
+            if (attribute_value == getFocusAttribute(current->keys[i])) {
+                results.push_back(current->keys[i]);
+            }
+
+            // But if we have exceeded the search value, we can stop searching as the keys are sorted
+            else if (attribute_value < getFocusAttribute(current->keys[i])) {
+                return results;
+            }
+        }
+        current = current->next;
+    }
+
+    return results;
+}
+
+
+// Normal search function with country filter
+std::vector<DataPoint> BPlusTree::searchByAttribute(int attribute_value, std::string country)
+{
+    std::vector<DataPoint> results;
+    TreeNode* current = root;
+    
+    // Traverse down the tree to find the appropriate leaf node
+    while (!current->is_leaf) {
+        int i = 0;
+        while (i < current->keys.size() && attribute_value > getFocusAttribute(current->keys[i])) {
+            i++;
+        }
+        current = current->children[i];
+    }
+
+    // As long as the end of the leaf nodes has not been reached
+    while (current != nullptr) {
+        // for the keys in the current leaf node
+        for (int i = 0; i < current->keys.size(); i++) {
+            // If the key matches the search value, add it to the results
+            if (attribute_value == getFocusAttribute(current->keys[i]) && country == current->keys[i].getCountry()) {
+                results.push_back(current->keys[i]);
+            }
+
+            // But if we have exceeded the search value, we can stop searching as the keys are sorted
+            else if (attribute_value < getFocusAttribute(current->keys[i])) {
+                return results;
+            }
+        }
+        current = current->next;
+    }
+
+    return results;
+}
+
+
+// Search by date function
+std::vector<DataPoint> BPlusTree::searchByDate(std::string date)
+{
+    std::vector<DataPoint> results;
+    TreeNode* current = root;
+    
+    // Traverse down the tree to find the appropriate leaf node
+    while (!current->is_leaf) {
+        int i = 0;
+        while (i < current->keys.size() && date > current->keys[i].getDate()) {
+            i++;
+        }
+        current = current->children[i];
+    }
+
+    // As long as the end of the leaf nodes has not been reached
+    while (current != nullptr) {
+        // for the keys in the current leaf node
+        for (int i = 0; i < current->keys.size(); i++) {
+            // If the key matches the search value, add it to the results
+            if (date == current->keys[i].getDate()) {
+                results.push_back(current->keys[i]);
+            }
+
+            // But if we have exceeded the search value, we can stop searching as the keys are sorted
+            else if (date < current->keys[i].getDate()) {
+                return results;
+            }
+        }
+        current = current->next;
+    }
+
+    return results;
+}
+
+
+// Search by date function with country filter
+std::vector<DataPoint> BPlusTree::searchByDate(std::string date, std::string country)
+{
+    std::vector<DataPoint> results;
+    TreeNode* current = root;
+    
+    // Traverse down the tree to find the appropriate leaf node
+    while (!current->is_leaf) {
+        int i = 0;
+        while (i < current->keys.size() && date > current->keys[i].getDate()) {
+            i++;
+        }
+        current = current->children[i];
+    }
+
+    // As long as the end of the leaf nodes has not been reached
+    while (current != nullptr) {
+        // for the keys in the current leaf node
+        for (int i = 0; i < current->keys.size(); i++) {
+            // If the key matches the search value, add it to the results
+            if (date == current->keys[i].getDate() && country == current->keys[i].getCountry()) {
+                results.push_back(current->keys[i]);
+            }
+
+            // But if we have exceeded the search value, we can stop searching as the keys are sorted
+            else if (date < current->keys[i].getDate()) {
+                return results;
+            }
+        }
+        current = current->next;
+    }
+
+    return results;
 }
