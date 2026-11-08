@@ -44,6 +44,7 @@ int BPlusTree::getFocusAttribute(DataPoint& dp) {
     } else {
         return dp.getTotDeaths();
     }
+    return 0;
 }
 
 
@@ -107,7 +108,9 @@ void BPlusTree::insert_non_full(TreeNode * node, DataPoint data_point)
             }
             i++;
         }
-
+        if (!inserted)
+            node->keys.push_back(data_point);
+        node->key_count = node->keys.size();
     }
 
     // in the case where the node is not a leaf
@@ -156,7 +159,7 @@ void BPlusTree::split(TreeNode* parent, TreeNode* child, int index)
     if (!child->is_leaf) {
         // Moves upper half of keys (except the median) to the new node
         new_node->keys.assign(child->keys.begin() + median_index + 1, child->keys.end());
-        child->keys.resize(median_index, DataPoint("", "", "", "", "", "", ""));
+        child->keys.resize(median_index, DataPoint());
         
         // moves upper half of children to the new node
         new_node->children.assign(child->children.begin() + median_index + 1, child->children.end());
@@ -167,7 +170,7 @@ void BPlusTree::split(TreeNode* parent, TreeNode* child, int index)
     } else {
         // moves upper half of keys to the new node
         new_node->keys.assign(child->keys.begin() + median_index, child->keys.end());
-        child->keys.resize(median_index, DataPoint("", "", "", "", "", "", ""));
+        child->keys.resize(median_index, DataPoint());
 
         // Ensures the new leaf is properly connected to the next leaf, and the old one to it
         new_node->next = child->next;

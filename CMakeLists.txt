@@ -20,6 +20,10 @@ add_executable(Project_2___Cogwork_Engineers
         src/DataHeap.h
         src/DataPoint.cpp
         src/DataPoint.h
+        src/FeatureLog.cpp
+        src/FeatureLog.h
+        src/MenuUI.cpp
+        src/MenuUI.h
         src/main.cpp
 )
 

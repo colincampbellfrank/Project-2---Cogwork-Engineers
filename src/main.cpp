@@ -7,8 +7,9 @@
 #include <string>
 #include <vector>
 #include "DataPoint.h"
-#include "bPlus.h"
 #include "DataHeap.h"
+#include "bPlus.h"
+#include "MenuUI.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -57,4 +58,12 @@ int main() {
     }
     file.close();
 
+    BPlusTree bPlusTree("date");
+    for (size_t i = 0; i < data.size(); ++i)
+        bPlusTree.insert(data[i]);
+
+    MenuUI menu(data, bPlusTree);
+    menu.run();
+
+    return 0;
 }

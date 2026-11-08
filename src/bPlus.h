@@ -22,10 +22,10 @@ class BPlusTree
         std::vector<TreeNode*> children;
 
         // empty node constructor
-        TreeNode(bool _is_leaf) :is_leaf(_is_leaf), keys({}), children({}) {};
+        TreeNode(bool _is_leaf) : is_leaf(_is_leaf), key_count(0), keys({}), children({}) {};
 
         // node constructor with data point
-        TreeNode(DataPoint _data, bool _is_leaf) : keys({ _data}), is_leaf(_is_leaf), children({}) {};
+        TreeNode(DataPoint _data, bool _is_leaf) : is_leaf(_is_leaf), key_count(1), keys({ _data}), children({}) {};
     };
 
     TreeNode* root = nullptr;
@@ -55,7 +55,7 @@ public:
         }
     }
 
-    BPlusTree(std::string attribute, int _max_keys) : focus_attribute(attribute), max_keys(max_keys) {
+    BPlusTree(std::string attribute, int _max_keys) : focus_attribute(attribute), max_keys(_max_keys) {
         if (attribute != "new_cases" && attribute != "tot_cases" && attribute != "new_deaths" && attribute != "tot_deaths") {
             focus_attribute = "date";
         }

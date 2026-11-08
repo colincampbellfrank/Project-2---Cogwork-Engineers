@@ -44,6 +44,7 @@ public:
             cout<<"attribute heapify error"<<endl;
             return result;
         }
+        return result;
     }
     vector<int> heapify_interpretAtt(int i) { //used for heapify specifically
         vector<int> result;
@@ -83,6 +84,7 @@ public:
         result.push_back(left_value);
         result.push_back(right_value);
         result.push_back(largest_value);
+        return result;
     }
 
     void heapify(int i) {
@@ -90,15 +92,10 @@ public:
         int left=2*i+1;
         int right=2*i+2;
 
-        vector<int> values=heapify_interpretAtt(i);
-        int left_value=values[0];
-        int right_value=values[1];
-        int largest_value=values[2];
-
-        if (left<size && left_value>largest_value) {
+        if (left<size && ind_interpretAtt(left)>ind_interpretAtt(largest)) {
             largest=left;
         }
-        if (right<size && right_value>largest_value) {
+        if (right<size && ind_interpretAtt(right)>ind_interpretAtt(largest)) {
             largest=right;
         }
         if (largest!=i) {
@@ -108,15 +105,16 @@ public:
     }
     //buildHeap function unnecessary since we won't give an array to build from
     void insert (DataPoint point) {
-        size++;
+        array.push_back(point);
+        size = array.size();
         int i=size-1;
-        array[i]=point;
         int point_value=ind_interpretAtt(i); //use helper to get the relevant value based on attribute
         int parent_value=ind_interpretAtt((i-1)/2);
 
         while (i!=0 && parent_value<point_value) {
             swap(array[i], array[(i-1)/2]);
             i=(i-1)/2;
+            parent_value=ind_interpretAtt((i-1)/2);
         }
     }
     DataPoint top() { //return attribute value of the top element
@@ -127,20 +125,26 @@ public:
         if (size <= 0) cout<<"pop error, empty heap"<<endl;
         if (size == 1) {
             size--;
-            return array[0];
+            DataPoint root = array[0];
+            array.pop_back();
+            return root;
         }
         //store the maximum value, and remove it
         DataPoint root = array[0];
         array[0]=array[size - 1];
+        array.pop_back();
         size--;
         //heapify the root node after deletion
         heapify(0);
         return root;
     }
     //won't add DeleteKey now as I don't think it will be used in the functions required
+    int getSize() const {
+        return size;
+    }
+    bool empty() const {
+        return size == 0;
+    }
 };
-
-
-
 
 #endif //PROJECT_2___COGWORK_ENGINEERS_DATAHEAP_H
