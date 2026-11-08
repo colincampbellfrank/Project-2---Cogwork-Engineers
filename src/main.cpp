@@ -13,7 +13,7 @@
 using namespace std;
 
 int main() {
-    ifstream file("WHO-COVID-19-global-daily-data.csv");
+    ifstream file("../resources/WHO-COVID-19-global-daily-data.csv");
 
     if (!file.is_open()) {
         cerr << "Error: Could not open the file." << endl;

@@ -70,7 +70,7 @@ public:
             // Notes:
             // If the specified attribute is tied (ex: total_deaths = total_deaths), the insertion will resort
             // to using the date to break the tie and then country alphabetically if the date is also tied
-    void insert(DataPoint dataPoint);
+    void insert(DataPoint &dataPoint);
 
 
 

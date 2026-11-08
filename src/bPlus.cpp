@@ -1,14 +1,15 @@
 #include "bPlus.h"
-#include <utility>
+
+#include <algorithm>
 #include <iostream>
 #include <ostream>
-#include <functional>
+#include "DataPoint.h"
 
 
 // ----------- Tree Function Definitions Here ------------
 // Check bPlus.h for function descriptions and use instructions
 
-void BPlusTree::insert(DataPoint data_point)
+void BPlusTree::insert(DataPoint &data_point)
 {
     
     // If tree is empty, create a new root node and insert the data point
@@ -66,27 +67,47 @@ void BPlusTree::insert_non_full(TreeNode * node, DataPoint data_point)
 
     if (node->is_leaf){
 
-        node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), data_point, 
-            //as DataPoint is a custom class, a lambda function is used for comparison of the focus attribute
-            [this](DataPoint& a, DataPoint& b) {
+        // node->keys.insert(upper_bound(node->keys.begin(), node->keys.end(), data_point,
+        //     //as DataPoint is a custom class, a lambda function is used for comparison of the focus attribute
+        //     [this](DataPoint&  a, DataPoint& b)
+        //     {
+        //
+        //         // checks every possible focus attribute for if they are tied, and if not, returns the comparison
+        //         if (focus_attribute != "date") {
+        //             if (getFocusAttribute(a) != getFocusAttribute(b)) {
+        //                 return getFocusAttribute(a) < getFocusAttribute(b);
+        //             }
+        //
+        //         // in the case of a tie, or the focus attribute is 'date', compare by date, and then country if the date is also tied
+        //         } else if (a.getDate() != b.getDate()){
+        //             return a.getDate() < b.getDate();
+        //         }
+        //         return a.getCountry() < b.getCountry();
+        //     }
+        // ), data_point );
 
-                // checks every possible focus attribute for if they are tied, and if not, returns the comparison
-                if (focus_attribute != "date") {
-                    if (getFocusAttribute(a) != getFocusAttribute(b)) {
-                        return getFocusAttribute(a) < getFocusAttribute(b);
-                    }
-                
-                // in the case of a tie, or the focus attribute is 'date', compare by date, and then country if the date is also tied
-                } else {
-                    if (a.getDate() != b.getDate()) {
-                        return a.getDate() < b.getDate();
-                    } else {
-                        return a.getCountry() < b.getCountry();
-                    }
+        int i = 0;
+        bool inserted = false;
+
+        while (i < node->keys.size() && inserted == false) {
+            // checks every possible focus attribute for if they are tied, and if not, returns the comparison
+            if (focus_attribute != "date") {
+                if (getFocusAttribute(node->keys[i]) < getFocusAttribute(data_point)) {
+                    node->keys.insert(node->keys.begin() + i, data_point);
+                    inserted = true;
                 }
 
+                // in the case of a tie, or the focus attribute is 'date', compare by date, and then country if the date is also tied
+            } else if (node->keys[i].getDate() < data_point.getDate()){
+                node->keys.insert(node->keys.begin() + i, data_point);
+                inserted = true;
+            } else if (node->keys[i].getCountry() < data_point.getCountry()) {
+                node->keys.insert(node->keys.begin() + i, data_point);
+                inserted = true;
             }
-        ), data_point ); 
+            i++;
+        }
+
     }
 
     // in the case where the node is not a leaf
@@ -135,7 +156,7 @@ void BPlusTree::split(TreeNode* parent, TreeNode* child, int index)
     if (!child->is_leaf) {
         // Moves upper half of keys (except the median) to the new node
         new_node->keys.assign(child->keys.begin() + median_index + 1, child->keys.end());
-        child->keys.resize(median_index);
+        child->keys.resize(median_index, DataPoint("", "", "", "", "", "", ""));
         
         // moves upper half of children to the new node
         new_node->children.assign(child->children.begin() + median_index + 1, child->children.end());
@@ -146,7 +167,7 @@ void BPlusTree::split(TreeNode* parent, TreeNode* child, int index)
     } else {
         // moves upper half of keys to the new node
         new_node->keys.assign(child->keys.begin() + median_index, child->keys.end());
-        child->keys.resize(median_index);
+        child->keys.resize(median_index, DataPoint("", "", "", "", "", "", ""));
 
         // Ensures the new leaf is properly connected to the next leaf, and the old one to it
         new_node->next = child->next;
