@@ -13,8 +13,6 @@
 
 using namespace std;
 
-// SFML template https://www.sfml-dev.org/documentation/3.1.0/
-
 int main() {
     ifstream file("../../resources/WHO-COVID-19-global-daily-data.csv");
 
