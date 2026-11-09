@@ -11,8 +11,6 @@
 #include "bPlus.h"
 #include "MenuUI.h"
 
-#include <SFML/Graphics.hpp>
-
 using namespace std;
 
 // SFML template https://www.sfml-dev.org/documentation/3.1.0/

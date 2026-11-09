@@ -16,9 +16,7 @@ FetchContent_MakeAvailable(SFML)
 add_executable(Project_2___Cogwork_Engineers
         src/bPlus.cpp
         src/bPlus.h
-        src/DataHeap.cpp
         src/DataHeap.h
-        src/DataPoint.cpp
         src/DataPoint.h
         src/FeatureLog.cpp
         src/FeatureLog.h
