@@ -20,7 +20,8 @@ add_executable(Project_2___Cogwork_Engineers
         src/DataHeap.h
         src/DataPoint.cpp
         src/DataPoint.h
-        src/main.cpp)
+        src/main.cpp
+)
 
 target_compile_features(Project_2___Cogwork_Engineers PRIVATE cxx_std_17)
 target_link_libraries(Project_2___Cogwork_Engineers PRIVATE SFML::Graphics)
