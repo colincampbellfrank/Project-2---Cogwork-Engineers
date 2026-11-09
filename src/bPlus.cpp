@@ -41,7 +41,7 @@ int BPlusTree::getFocusAttribute(DataPoint& dp) {
         return dp.getTotCases();
     } else if (focus_attribute == "new_deaths") {
         return dp.getNewDeaths();
-    } else if (focus_attribute == "tot_deaths") {
+    } else {
         return dp.getTotDeaths();
     }
 }
